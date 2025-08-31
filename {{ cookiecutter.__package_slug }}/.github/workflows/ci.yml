@@ -1,36 +1,69 @@
+###############################
+# CI for {{ cookiecutter.__package_slug }}
+#
+# Overview
+# - CI: Install deps, run tests, upload coverage
+#
+# Required repository configuration
+# - Secrets:
+#   - CODECOV_TOKEN (for CI coverage upload)
+###############################
+
 name: ci
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - "main"
+    paths:
+      - "src/**"
+      - ".github/**"
+      - ".build/**"
+      - poetry.lock
+      - pyproject.toml
+      - tests/**
+      - .github/workflows/ci.yml
+
+env:
+  # General
+  PACKAGE_NAME: "{{ cookiecutter.__package_slug }}"
+  PYTHON_VERSION: "{{ cookiecutter.python_version }}"
+  MIN_COVERAGE: 0
 
 jobs:
-  ci:
+  continuous-integration:
     # Set up operating system
     runs-on: ubuntu-latest
 
     # Define job steps
     steps:
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "{{ cookiecutter.python_version }}"
-
       - name: Check-out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "{% raw %}${{ env.PYTHON_VERSION }}{% endraw %}"
 
       - name: Install poetry
         uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
 
-      - name: Install package
+      - name: Install package dependencies
         run: poetry install
 
-      - name: Test with pytest
-        run: poetry run pytest tests/ --cov={{ cookiecutter.__package_slug }} --cov-report=xml
+      - name: Run tests with pytest
+        run: |
+          poetry run pytest tests/ \
+            --cov={{ cookiecutter.__package_slug }} \
+            --cov-report=xml \
+            --cov-report=term-missing \
+            --cov-fail-under={% raw %}${{ env.MIN_COVERAGE }}{% endraw %}
 
-      - name: Use Codecov to track coverage
+      - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
-          token: {% raw %}${{ secrets.CODECOV_TOKEN }}{% endraw %}
-          files: ./coverage.xml   # coverage report
-
-      - name: Build documentation
-        run: poetry run make html --directory docs/
+          files: ./coverage.xml
+        env:
+          CODECOV_TOKEN: "{% raw %}${{ secrets.CODECOV_TOKEN }}{% endraw %}"

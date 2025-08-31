@@ -1,0 +1,21 @@
+{
+  "python.defaultInterpreterPath": "${env:HOME}/.pyenv/versions/${workspaceFolderBasename}/bin/python",
+  "python.analysis.typeCheckingMode": "basic",
+  "python.terminal.activateEnvironment": true,
+  "python.venvPath": "${env:HOME}/.pyenv/versions",
+  "terminal.integrated.profiles.osx": {
+    "{{ cookiecutter.__package_slug }}": {
+      "path": "zsh",
+      "args": [
+        "-l",
+        "-c",
+        "cd '${workspaceFolder}'; ./scripts/setup_env.sh; exec zsh -l"
+      ]
+    }
+  },
+  "terminal.integrated.defaultProfile.osx": "{{ cookiecutter.__package_slug }}",
+  "task.allowAutomaticTasks": "on",
+  "python.testing.pytestArgs": ["tests"],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true
+}

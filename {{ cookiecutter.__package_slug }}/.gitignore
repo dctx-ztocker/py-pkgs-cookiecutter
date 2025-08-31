@@ -1,3 +1,8 @@
+.venv/
+.python-version
+__pycache__/
+*.pyc
+.DS_Store
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -60,6 +65,7 @@ coverage.xml
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
+{{ cookiecutter.__package_slug }}.db
 
 # Flask stuff:
 instance/
@@ -131,6 +137,9 @@ dmypy.json
 
 # PyCharm
 .idea/
+
+# Ruff cache
+.ruff_cache/
 
 # RStudio project files
 **.Rproj.user/

@@ -1,25 +1,38 @@
 # {{ cookiecutter.__package_slug }}
 
-{{ cookiecutter.package_short_description }}
+A package for doing great things!
 
 ## Installation
 
-```bash
-$ pip install {{ cookiecutter.__package_slug }}
-```
+This project automatically sets up the Python environment when opened in VS Code.
+For other installation methods, see the [installation guide](docs/installation.md).
 
 ## Usage
 
-- TODO
+- For a complete usage guide, see [`docs/USAGE.md`](docs/USAGE.md).
+
+Quick summary:
+
+- Installation and setup: see [`docs/installation.md`](docs/installation.md)
+- Common commands: use the `Makefile` (`make setup`, `make deps`, `make test`)
+- Repository usage guide: [`docs/USAGE.md`](docs/USAGE.md)
+
+### Docker
+
+- Build the base image (uses `.build/Dockerfile`):
 
 ## Contributing
 
-Interested in contributing? Check out the contributing guidelines. Please note that this project is released with a Code of Conduct. By contributing to this project, you agree to abide by its terms.
+Interested in contributing? Check out the contributing guidelines. Please note that
+this project is released with a Code of Conduct. By contributing to this project,
+you agree to abide by its terms.
 
 ## License
 
-`{{ cookiecutter.__package_slug }}` was created by {{ cookiecutter.author_name }}. {% if cookiecutter.open_source_license != 'None' -%}It is licensed under the terms of the {{ cookiecutter.open_source_license }} license.{% else %}{{ cookiecutter.author_name }} retains all rights to the source and it may not be reproduced, distributed, or used to create derivative works.{% endif %}
+`{{ cookiecutter.__package_slug }}` was created by Jose Miguel Resendiz <josemiguel@ztocker.com>.
+It is licensed under the terms of the MIT license.
 
 ## Credits
 
-`{{ cookiecutter.__package_slug }}` was created with [`cookiecutter`](https://cookiecutter.readthedocs.io/en/latest/) and the `py-pkgs-cookiecutter` [template](https://github.com/py-pkgs/py-pkgs-cookiecutter).
+`{{ cookiecutter.__package_slug }}` was created with [`cookiecutter`](https://cookiecutter.readthedocs.io/en/latest/)
+and the `py-pkgs-cookiecutter` [template](https://github.com/ztocker/py-pkgs-cookiecutter).

@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mypkg Tasks UI</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      crossorigin="anonymous"
+    />
+    <style>
+      body {
+        background: #f8fafc;
+      }
+      .card {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
+      .brand {
+        font-weight: 700;
+        letter-spacing: 0.3px;
+      }
+      .muted {
+        color: #6c757d;
+      }
+      .task-completed {
+        text-decoration: line-through;
+        color: #6c757d;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom">
+      <div class="container-fluid">
+        <span class="navbar-brand brand">{{ cookiecutter.__package_slug }}</span>
+        <span class="muted">Mini UI</span>
+      </div>
+    </nav>
+
+    <div class="container my-4">
+      <div class="row g-4">
+        <div class="col-12 col-lg-4">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Nueva lista</h5>
+              <div class="input-group mb-2">
+                <input
+                  id="newListName"
+                  type="text"
+                  class="form-control"
+                  placeholder="Nombre de la lista"
+                />
+                <button id="createListBtn" class="btn btn-primary">
+                  Crear
+                </button>
+              </div>
+              <div class="form-text">
+                Crea una lista para organizar tus tareas.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-lg-8">
+          <div class="card">
+            <div class="card-body">
+              <div
+                class="d-flex justify-content-between align-items-center mb-3"
+              >
+                <h5 class="card-title mb-0">Tareas</h5>
+                <div class="d-flex gap-2 align-items-center">
+                  <label for="listSelect" class="form-label mb-0">Lista</label>
+                  <select
+                    id="listSelect"
+                    class="form-select form-select-sm"
+                    style="min-width: 220px"
+                  ></select>
+                </div>
+              </div>
+
+              <div class="row g-2 mb-3">
+                <div class="col-12 col-md-4">
+                  <input
+                    id="taskTitle"
+                    type="text"
+                    class="form-control"
+                    placeholder="Título"
+                  />
+                </div>
+                <div class="col-12 col-md-6">
+                  <input
+                    id="taskDesc"
+                    type="text"
+                    class="form-control"
+                    placeholder="Descripción (opcional)"
+                  />
+                </div>
+                <div class="col-12 col-md-2 d-grid">
+                  <button id="addTaskBtn" class="btn btn-success">
+                    Agregar
+                  </button>
+                </div>
+              </div>
+
+              <ul id="tasksList" class="list-group"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const api = {
+        lists: {
+          list: async () => (await fetch("/task-lists/")).json(),
+          create: async (name) =>
+            (
+              await fetch("/task-lists/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name }),
+              })
+            ).json(),
+        },
+        tasks: {
+          byList: async (id) => (await fetch(`/tasks/by-list/${id}`)).json(),
+          create: async (task_list_id, title, description) =>
+            (
+              await fetch("/tasks/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ task_list_id, title, description }),
+              })
+            ).json(),
+          complete: async (id) =>
+            (await fetch(`/tasks/${id}/complete`, { method: "POST" })).json(),
+        },
+      };
+
+      const listSelect = document.getElementById("listSelect");
+      const tasksList = document.getElementById("tasksList");
+      const newListName = document.getElementById("newListName");
+      const createListBtn = document.getElementById("createListBtn");
+      const addTaskBtn = document.getElementById("addTaskBtn");
+      const taskTitle = document.getElementById("taskTitle");
+      const taskDesc = document.getElementById("taskDesc");
+
+      function option(value, text) {
+        const o = document.createElement("option");
+        o.value = value;
+        o.textContent = text;
+        return o;
+      }
+
+      async function refreshLists(selectIdToKeep) {
+        const lists = await api.lists.list();
+        listSelect.innerHTML = "";
+        if (lists.length === 0) {
+          listSelect.appendChild(option("", "— sin listas —"));
+          tasksList.innerHTML =
+            '<li class="list-group-item">No hay tareas</li>';
+          return;
+        }
+        for (const l of lists) listSelect.appendChild(option(l.id, l.name));
+        const selected = selectIdToKeep || lists[0].id;
+        listSelect.value = selected;
+        await refreshTasks(selected);
+      }
+
+      function renderTaskItem(t) {
+        const li = document.createElement("li");
+        li.className =
+          "list-group-item d-flex justify-content-between align-items-center";
+        const left = document.createElement("div");
+        left.innerHTML =
+          `<div class="fw-semibold ${t.is_completed ? "task-completed" : ""}">${t.title}</div>` +
+          (t.description
+            ? `<div class="small text-muted">${t.description}</div>`
+            : "");
+        const right = document.createElement("div");
+        if (!t.is_completed) {
+          const btn = document.createElement("button");
+          btn.className = "btn btn-outline-secondary btn-sm";
+          btn.textContent = "Completar";
+          btn.onclick = async () => {
+            await api.tasks.complete(t.id);
+            await refreshTasks(listSelect.value);
+          };
+          right.appendChild(btn);
+        } else {
+          right.innerHTML = '<span class="badge bg-success">Hecha</span>';
+        }
+        li.appendChild(left);
+        li.appendChild(right);
+        return li;
+      }
+
+      async function refreshTasks(listId) {
+        tasksList.innerHTML = '<li class="list-group-item">Cargando...</li>';
+        const tasks = await api.tasks.byList(listId);
+        tasksList.innerHTML = "";
+        if (tasks.length === 0) {
+          tasksList.innerHTML =
+            '<li class="list-group-item">No hay tareas</li>';
+          return;
+        }
+        for (const t of tasks) tasksList.appendChild(renderTaskItem(t));
+      }
+
+      createListBtn.addEventListener("click", async () => {
+        const name = newListName.value.trim();
+        if (!name) return;
+        const created = await api.lists.create(name);
+        newListName.value = "";
+        await refreshLists(created.id);
+      });
+
+      addTaskBtn.addEventListener("click", async () => {
+        const title = taskTitle.value.trim();
+        if (!title) return;
+        const description = taskDesc.value.trim();
+        await api.tasks.create(listSelect.value, title, description || null);
+        taskTitle.value = "";
+        taskDesc.value = "";
+        await refreshTasks(listSelect.value);
+      });
+
+      listSelect.addEventListener("change", async (e) => {
+        await refreshTasks(e.target.value);
+      });
+
+      (async function init() {
+        await refreshLists();
+      })();
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
