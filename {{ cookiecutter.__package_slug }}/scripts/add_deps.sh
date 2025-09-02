@@ -93,7 +93,7 @@ install_core() {
         echo "Installing complete core dependencies..."
 
         # Runtime dependencies (required for package to work)
-        poetry_add_with_timeout add click python-dotenv pydantic || return 1
+        poetry_add_with_timeout add "click^8.2.1" python-dotenv pydantic || return 1
         poetry_add_with_timeout add pydantic-settings email-validator || return 1
         poetry_add_with_timeout add sqlalchemy fastapi uvicorn || return 1
         poetry_add_with_timeout add alembic dependency-injector || return 1
@@ -102,7 +102,7 @@ install_core() {
 
         # Development dependencies (for publishing and development)
         poetry_add_with_timeout add --group dev twine pre-commit || return 1
-        poetry_add_with_timeout add --group dev python-semantic-release || return 1
+        poetry_add_with_timeout add --group dev "python-semantic-release^9.21.1" || return 1
         poetry_add_with_timeout add --group dev ipython ipdb || return 1
 
         # TODO: Add new runtime dependencies here:
@@ -115,7 +115,7 @@ install_core() {
         echo "Installing basic core dependencies..."
 
         # Basic runtime dependencies only
-        poetry_add_with_timeout add click python-dotenv pydantic || return 1
+        poetry_add_with_timeout add "click^8.2.1" python-dotenv pydantic || return 1
 
         # TODO: Add new basic runtime dependencies here:
         # poetry_add_with_timeout add package-name || return 1
