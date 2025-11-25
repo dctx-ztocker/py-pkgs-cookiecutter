@@ -230,13 +230,28 @@ main() {
   if [[ "$missing" -eq 0 ]]; then
     if check_python_version_in_pyenv; then
       # If Python base version exists, verify project virtualenv association
-      local constraint version
+      local constraint version env_name local_name project_name
       constraint=$(read_pyproject_python_constraint || true)
       version=$(resolve_exact_python_version "$constraint" || true)
       if ! check_project_virtualenv "$version"; then
         # Attempt to create the missing env
         if ! create_project_virtualenv "$version"; then
           missing=1
+        fi
+      fi
+
+      # Always ensure pyenv local is set (creates/updates .python-version)
+      if [[ "$missing" -eq 0 ]]; then
+        local_name=$(read_local_env_name || true)
+        project_name=$(read_project_name || true)
+        if [[ -n "${local_name:-}" ]]; then
+          env_name="$local_name"
+        elif [[ -n "${project_name:-}" ]]; then
+          env_name="$project_name"
+        fi
+
+        if [[ -n "${env_name:-}" ]]; then
+          pyenv local "$env_name"
         fi
       fi
     else

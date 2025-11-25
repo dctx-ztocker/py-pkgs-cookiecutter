@@ -1,19 +1,26 @@
 {
   "python.defaultInterpreterPath": "${env:HOME}/.pyenv/versions/${workspaceFolderBasename}/bin/python",
   "python.analysis.typeCheckingMode": "basic",
-  "python.terminal.activateEnvironment": true,
+  "python.terminal.activateEnvironment": false,
   "python.venvPath": "${env:HOME}/.pyenv/versions",
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.python",
+    "editor.formatOnSave": false
+  },
   "terminal.integrated.profiles.osx": {
     "{{ cookiecutter.__package_slug }}": {
       "path": "zsh",
-      "args": [
-        "-l",
-        "-c",
-        "cd '${workspaceFolder}'; ./scripts/setup_env.sh; exec zsh -l"
-      ]
+      "args": ["-l", "-c", "cd '${workspaceFolder}'; eval \"$(pyenv init -)\"; ./scripts/setup_env.sh; pyenv shell {{ cookiecutter.__package_slug }}; exec zsh -l"]
     }
   },
   "terminal.integrated.defaultProfile.osx": "{{ cookiecutter.__package_slug }}",
+  "terminal.integrated.profiles.linux": {
+    "{{ cookiecutter.__package_slug }}": {
+      "path": "zsh",
+      "args": ["-l", "-c", "cd '${workspaceFolder}'; eval \"$(pyenv init -)\"; ./scripts/setup_env.sh; pyenv shell {{ cookiecutter.__package_slug }}; exec zsh -l"]
+    }
+  },
+  "terminal.integrated.defaultProfile.linux": "{{ cookiecutter.__package_slug }}",
   "task.allowAutomaticTasks": "on",
   "python.testing.pytestArgs": ["tests"],
   "python.testing.unittestEnabled": false,

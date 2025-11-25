@@ -16,16 +16,6 @@
   ],
   "include_github_actions": [
     "no",
-    "ci",
-    "ci+cd"
-  ],
-  "deploy_target": [
-    "none",
-    "codeartifact",
-    "ecr",
-    "both"
-  ],
-  "ecr_repository_name": "my-ecr-repository",
-  "codeartifact_domain_name": "my-domain",
-  "codeartifact_repository_name": "my-codeartifact-repository"
+    "ci"
+  ]
 }

@@ -1,4 +1,4 @@
-.PHONY: help setup deps deps-core deps-test deps-all docker docker-up docker-down docker-logs test test-cov clean install start dev prod test-crud test-api test-api-verbose
+.PHONY: help setup deps docker docker-up docker-down docker-logs test test-cov clean install start dev prod test-crud test-api test-api-verbose
 
 # Default target
 help:
@@ -11,10 +11,7 @@ help:
 	@echo ""
 	@echo "🔧 Development Commands:"
 	@echo "  setup         - Setup Python development environment"
-	@echo "  deps          - Install all dependencies (default)"
-	@echo "  deps-core     - Install core dependencies only"
-	@echo "  deps-test     - Install testing dependencies only"
-	@echo "  deps-all      - Install all dependencies (same as deps)"
+	@echo "  deps          - Install dependencies from pyproject.toml"
 	@echo "  install       - Install package in development mode"
 	@echo "  test          - Run unit tests with pytest"
 	@echo "  test-cov      - Run tests with coverage report"
@@ -38,23 +35,10 @@ setup:
 	@echo "🔧 Setting up Python development environment..."
 	@bash -c "./scripts/setup_env.sh"
 
-# Install all dependencies (default behavior)
-deps: deps-all
-
-# Install core dependencies only
-deps-core:
-	@echo "📦 Installing core dependencies..."
-	@bash -c "./scripts/add_deps.sh --core"
-
-# Install testing dependencies only
-deps-test:
-	@echo "🧪 Installing testing dependencies..."
-	@bash -c "./scripts/add_deps.sh --test"
-
-# Install all dependencies
-deps-all:
-	@echo "📦 Installing all dependencies..."
-	@bash -c "./scripts/add_deps.sh --all"
+# Install dependencies from pyproject.toml
+deps:
+	@echo "📦 Installing dependencies..."
+	poetry install
 
 # Build Docker image
 docker-build:
