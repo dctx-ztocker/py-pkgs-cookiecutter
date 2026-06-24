@@ -17,6 +17,18 @@ repos:
       - id: debug-statements
 
   # =============================================================================
+  # Markdown (wrap prose at 100 cols, align GFM tables)
+  # =============================================================================
+  - repo: https://github.com/hukkin/mdformat
+    rev: 1.0.0
+    hooks:
+      - id: mdformat
+        args: ["--wrap", "100"]
+        additional_dependencies:
+          - mdformat-gfm==1.0.0
+        exclude: '^CHANGELOG\.md$'
+
+  # =============================================================================
   # Security hooks
   # =============================================================================
   - repo: https://github.com/Yelp/detect-secrets
